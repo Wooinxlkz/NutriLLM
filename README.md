@@ -378,8 +378,6 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 - [OpenAI](https://openai.com) for the GPT API
 - [OpenFoodFacts](https://world.openfoodfacts.org) for the open food database
-- [Google Research Nutrition5k](https://github.com/google-research-datasets/Nutrition5k) for the dataset
-- [Replit](https://replit.com) for hosting and the AI integration proxy
 - [shadcn/ui](https://ui.shadcn.com) for the component library
 
 ---
