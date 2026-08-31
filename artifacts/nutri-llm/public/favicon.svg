@@ -1,0 +1,15 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF4500"/>
+      <stop offset="100%" stop-color="#C41800"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="38" fill="url(#bg)"/>
+  <path d="M44 104 Q44 148 90 148 Q136 148 136 104" fill="white" fill-opacity="0.95"/>
+  <ellipse cx="90" cy="104" rx="46" ry="12" fill="white"/>
+  <path d="M76 88 Q73 80 76 72 Q79 64 76 56" stroke="white" stroke-opacity="0.75" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M90 86 Q87 78 90 70 Q93 62 90 54" stroke="white" stroke-opacity="0.75" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M104 88 Q101 80 104 72 Q107 64 104 56" stroke="white" stroke-opacity="0.75" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <text x="90" y="138" font-family="Georgia,serif" font-size="38" font-weight="bold" fill="#C41800" text-anchor="middle">N</text>
+</svg>

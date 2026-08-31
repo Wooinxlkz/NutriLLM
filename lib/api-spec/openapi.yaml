@@ -1,0 +1,421 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: NutriLLM API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: nutrition
+    description: Food nutrition analysis
+  - name: foods
+    description: Food catalog
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /nutrition/analyze:
+    post:
+      operationId: analyzeFood
+      tags: [nutrition]
+      summary: Analyze food nutrition
+      description: Analyze a food item (Arabic or English) and return detailed nutrition, cultural context, regional variations, and health insights
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeFoodBody"
+      responses:
+        "200":
+          description: Food analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodAnalysis"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /nutrition/history:
+    get:
+      operationId: listAnalysisHistory
+      tags: [nutrition]
+      summary: List recent analysis history
+      description: Returns the 20 most recently analyzed foods
+      responses:
+        "200":
+          description: Analysis history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnalysisHistoryItem"
+
+  /foods:
+    get:
+      operationId: listFoods
+      tags: [foods]
+      summary: List MENA foods catalog
+      description: Returns a paginated catalog of MENA/Arabic foods with basic nutrition info
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search term (Arabic or English)
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [main, soup, salad, dessert, breakfast, snack, beverage]
+          description: Filter by food category
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by region (e.g., Moroccan, Lebanese, Egyptian)
+      responses:
+        "200":
+          description: Food catalog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodListResponse"
+
+  /foods/stats:
+    get:
+      operationId: getFoodStats
+      tags: [foods]
+      summary: Dataset statistics
+      description: Returns stats about the NutriLLM dataset — total foods, regions covered, languages, and top categories
+      responses:
+        "200":
+          description: Dataset statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatasetStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    AnalyzeFoodBody:
+      type: object
+      properties:
+        food:
+          type: string
+          description: Food name in Arabic or English (e.g. "طاجين دجاج مع الزيتون" or "chicken tagine")
+        servingSize:
+          type: string
+          description: Optional serving size (e.g. "1 plate", "200g")
+        language:
+          type: string
+          enum: [auto, ar, en]
+          default: auto
+          description: Response language preference
+      required:
+        - food
+
+    FoodAnalysis:
+      type: object
+      properties:
+        id:
+          type: string
+        food:
+          type: string
+          description: Original input
+        foodNameEn:
+          type: string
+          description: Food name in English
+        foodNameAr:
+          type: string
+          description: Food name in Arabic
+        servingSize:
+          type: string
+        nutrition:
+          $ref: "#/components/schemas/NutritionInfo"
+        culturalContext:
+          type: string
+          description: Cultural and historical background of the dish
+        culturalContextAr:
+          type: string
+          description: Cultural context in Arabic
+        regionalVariations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegionalVariation"
+        healthInsights:
+          type: array
+          items:
+            type: string
+          description: Health insights and recommendations in English
+        healthInsightsAr:
+          type: array
+          items:
+            type: string
+          description: Health insights in Arabic
+        ingredients:
+          type: array
+          items:
+            type: string
+        cuisine:
+          type: string
+        region:
+          type: string
+        category:
+          type: string
+          enum: [main, soup, salad, dessert, breakfast, snack, beverage]
+        tags:
+          type: array
+          items:
+            type: string
+        analyzedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - food
+        - foodNameEn
+        - foodNameAr
+        - nutrition
+        - culturalContext
+        - culturalContextAr
+        - regionalVariations
+        - healthInsights
+        - healthInsightsAr
+        - ingredients
+        - cuisine
+        - region
+        - category
+        - tags
+        - analyzedAt
+
+    NutritionInfo:
+      type: object
+      properties:
+        calories:
+          type: number
+        protein:
+          type: number
+          description: Protein in grams
+        carbs:
+          type: number
+          description: Carbohydrates in grams
+        fat:
+          type: number
+          description: Fat in grams
+        fiber:
+          type: number
+          description: Dietary fiber in grams
+        sugar:
+          type: number
+          description: Sugar in grams
+        sodium:
+          type: number
+          description: Sodium in milligrams
+        vitaminC:
+          type: number
+          description: Vitamin C in mg
+        iron:
+          type: number
+          description: Iron in mg
+      required:
+        - calories
+        - protein
+        - carbs
+        - fat
+
+    RegionalVariation:
+      type: object
+      properties:
+        region:
+          type: string
+        regionAr:
+          type: string
+        description:
+          type: string
+        descriptionAr:
+          type: string
+        keyDifferences:
+          type: array
+          items:
+            type: string
+      required:
+        - region
+        - regionAr
+        - description
+        - descriptionAr
+        - keyDifferences
+
+    AnalysisHistoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+        food:
+          type: string
+        foodNameEn:
+          type: string
+        foodNameAr:
+          type: string
+        nutrition:
+          $ref: "#/components/schemas/NutritionInfo"
+        cuisine:
+          type: string
+        region:
+          type: string
+        analyzedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - food
+        - foodNameEn
+        - foodNameAr
+        - nutrition
+        - cuisine
+        - region
+        - analyzedAt
+
+    FoodListResponse:
+      type: object
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodCatalogItem"
+        total:
+          type: integer
+        page:
+          type: integer
+      required:
+        - foods
+        - total
+        - page
+
+    FoodCatalogItem:
+      type: object
+      properties:
+        id:
+          type: string
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+        cuisine:
+          type: string
+        region:
+          type: string
+        category:
+          type: string
+        nutrition:
+          $ref: "#/components/schemas/NutritionInfo"
+        tags:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - nameEn
+        - nameAr
+        - cuisine
+        - region
+        - category
+        - nutrition
+        - tags
+
+    DatasetStats:
+      type: object
+      properties:
+        totalFoods:
+          type: integer
+        regionsCount:
+          type: integer
+        languagesSupported:
+          type: array
+          items:
+            type: string
+        topCategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryCount"
+        topRegions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegionCount"
+        modelVersion:
+          type: string
+        datasetVersion:
+          type: string
+      required:
+        - totalFoods
+        - regionsCount
+        - languagesSupported
+        - topCategories
+        - topRegions
+        - modelVersion
+        - datasetVersion
+
+    CategoryCount:
+      type: object
+      properties:
+        category:
+          type: string
+        count:
+          type: integer
+      required:
+        - category
+        - count
+
+    RegionCount:
+      type: object
+      properties:
+        region:
+          type: string
+        count:
+          type: integer
+      required:
+        - region
+        - count
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+        - message
